@@ -59,7 +59,7 @@ public class StringRequest extends Request<String> {
      * @param errorListener Error listener, or null to ignore errors
      */
     public StringRequest(
-            int url, String listener, @Nullable Listener<String> errorListener) {
+            String url, Listener<String> listener, @Nullable ErrorListener errorListener) {
         this(Method.GET, url, listener, errorListener);
     }
 

@@ -1,5 +1,6 @@
 package com.example.tianlong.lianxi_jingdong;
 
+import android.nfc.Tag;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -19,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.tianlong.lianxi_jingdong.activity.BaseActivity;
 import com.example.tianlong.lianxi_jingdong.network.UrlConstant;
+import com.example.tianlong.lianxi_jingdong.network.VolleySingleton;
 import com.example.tianlong.lianxi_jingdong.view.TitleBar;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
@@ -33,6 +36,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     private TagFlowLayout main_tagFlowLayout;
     private TabLayout main_tabLayout;
     private ViewPager main_viewPager;
+    private static final String TAG = "SEARCH";
     UrlConstant urlConstant;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +81,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                     String keyword = s.toString();
                     if (!TextUtils.isEmpty(keyword)){
                         //请求的方法数据
-                        try {
                             get(s.toString());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+
                     }
                 }
             });
@@ -89,14 +90,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     //单击搜索的方法
     @Override
     public void onClick(View view) {
-
+        switch (view.getId()){
+            case R.id.btn_search:
+                String s = main_edit_search.getText().toString();
+                get(s);
+                break;
+        }
     }
-    //请求的方法数据
-    public void get(String keyword) throws Exception {
+
+    /**
+     * 利用关键字搜索网络数据
+     * 请求的方法数据
+     * @param keyword
+     */
+    public void get(String keyword) {
+        //取消上次的请求
+        VolleySingleton.getInstance2().cancelReq(TAG);
         //拼接URL
         urlConstant = new UrlConstant();
         //拼接加转码   MIME字符串之间
-        String url = urlConstant.HOST + urlConstant.SEARCH+"?keyword="+ URLEncoder.encode(keyword,"UTF-8");
+        //urlConstant.HOST + urlConstant.SEARCH+"?keyword="
+        String url = "http://39.108.3.12:3000/v1/search/restaurant?keyword="+ URLEncoder.encode(keyword);
         //组装请求
         //请求方法，URL，正确响应，错误响应
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -104,6 +118,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             @Override
             public void onResponse(String response) {
                 Log.i(getLocalClassName(), response);
+                Toast.makeText(MainActivity.this,response+"",Toast.LENGTH_SHORT).show();
+
             }
             //请求数据失败的监听
         }, new Response.ErrorListener() {
@@ -113,6 +129,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             }
         });
 
+        request.setTag(TAG);
+        //添加到队列执行请求
+        VolleySingleton.getInstance1().addToRequestQueue(request);
 
     }
 }

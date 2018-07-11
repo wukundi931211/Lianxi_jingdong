@@ -7,6 +7,7 @@ package com.example.tianlong.lianxi_jingdong.network;
 
 import android.content.Context;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.example.tianlong.lianxi_jingdong.App;
@@ -24,7 +25,7 @@ import com.example.tianlong.lianxi_jingdong.App;
  */
 public class VolleySingleton {
     /**
-     * 定义一个实例
+     * 1. 定义一个实例
      *
      * volatile就可以说是java虚拟机提供的最轻量级的同步机制
      * 被volatile修饰的变量能够保证每个线程能够获取该变量的最新值，
@@ -32,31 +33,22 @@ public class VolleySingleton {
      */
     public static volatile VolleySingleton volleySingleton;
 
-    //定义队列
+    //2. 定义队列
     private static RequestQueue queue;
 
-    //定义上下文
+    //3. 定义上下文
     private static Context context;
-    //构造方法
+
+    //4. 构造方法
     public VolleySingleton(Context context) {
         this.context = context;
+        //5.实例队列
         queue = getQueue();
     }
 
-    /**
-     * 获得队列的方法
-     * @return
-     */
-    public RequestQueue getQueue() {
-        //若果队列是空
-        if (queue==null){
-            //通过volley创建新的队列
-            queue = Volley.newRequestQueue(context);
-        }
-        return queue;
-    }
 
-    /**
+
+    /**   7.
      * 双重检测机制（懒汉模式）
      *   1.synchroized 这个方法是为锁住，synchronized锁住的是括号里的对象,而不是代码。
      *   在Java中，synchronized关键字是用来控制线程同步的，就是在多线程的环境下，
@@ -87,7 +79,53 @@ public class VolleySingleton {
         }
         return volleySingleton;
     }
+    /**
+     *   8. 静态内部类
+     */
+    private static class SingletonInstance{
+        //此类加载好时 第二次就加载时不用二次加载
+        //INSTANCE  实例
+        private static final VolleySingleton INSTANCE = new VolleySingleton(App.context);
+    }
+
+    /**
+     *  9. 静态内部类实现返回单列
+     * @return
+     */
+    public static  VolleySingleton getInstance2(){
+        return SingletonInstance.INSTANCE;
+    }
+
+    /**
+     * 10. 添加请求到队列
+     * @param request
+     * @param <T>
+     */
+    public <T> void  addToRequestQueue(Request<T> request){
+        queue.add(request);
+    }
 
 
+    /**
+     * 5.获得队列的方法
+     * @return
+     */
+    public RequestQueue getQueue() {
+        //若果队列是空
+        if (queue==null){
+            //通过volley创建新的队列
+            queue = Volley.newRequestQueue(context);
+        }
+        return queue;
+    }
 
+    /**
+     * 11.取消请求
+     * @param tag
+     */
+    public void cancelReq(String tag){
+        if (queue!=null){
+            queue.cancelAll(tag);
+        }
+    }
 }

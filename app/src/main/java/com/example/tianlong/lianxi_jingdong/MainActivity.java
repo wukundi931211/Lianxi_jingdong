@@ -36,13 +36,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     private TagFlowLayout main_tagFlowLayout;
     private TabLayout main_tabLayout;
     private ViewPager main_viewPager;
-    private static final String TAG = "SEARCH";
+    private static final String TAG = "Search";
     UrlConstant urlConstant;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        initView();
     }
 
     @Override
@@ -78,6 +78,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
 
                 @Override
                 public void afterTextChanged(Editable s) {
+                    Log.d("EditText",s.toString());
+
                     String keyword = s.toString();
                     if (!TextUtils.isEmpty(keyword)){
                         //请求的方法数据
@@ -86,6 +88,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                     }
                 }
             });
+
+        main_titleBar.setBarListener(new TitleBar.BarListener() {
+            @Override
+            public void back() {
+                finish();
+            }
+        });
+
     }
     //单击搜索的方法
     @Override
@@ -109,7 +119,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         //拼接URL
         urlConstant = new UrlConstant();
         //拼接加转码   MIME字符串之间
-        //urlConstant.HOST + urlConstant.SEARCH+"?keyword="
+        //TODO urlConstant.HOST + urlConstant.SEARCH+"?keyword="
         String url = "http://39.108.3.12:3000/v1/search/restaurant?keyword="+ URLEncoder.encode(keyword);
         //组装请求
         //请求方法，URL，正确响应，错误响应
@@ -117,7 +127,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             //请求数据正确的监听
             @Override
             public void onResponse(String response) {
-                Log.i(getLocalClassName(), response);
+                Log.i("TAG", response.toString());
                 Toast.makeText(MainActivity.this,response+"",Toast.LENGTH_SHORT).show();
 
             }

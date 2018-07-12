@@ -46,6 +46,9 @@ public class VolleySingleton {
         queue = getQueue();
     }
 
+    public VolleySingleton() {
+
+    }
 
 
     /**   7.
